@@ -1,0 +1,32 @@
+{
+  "_comment": "提示词模板配置文件 / Prompt Template Configuration",
+  "_usage": "修改下方的 system_prompt 和 user_prompt_template 来自定义筛选标准",
+  
+  "screening_topic": "AI Memory",
+  "screening_topic_description": "人工智能记忆系统，包括 Agent 长期记忆、记忆架构、上下文管理等",
+  
+  "system_prompt": "你是一名 AI 领域专家研究员。任务是筛选属于 '{topic}' 范畴的顶会论文，并进行精细化评分。\n\n**核心任务**：\n不仅要判断'是否相关'，还要区分'相关程度'。目标是**极高召回率**。\n\n**评分标准 (1-10 分制) - 请严格对齐语义**：\n\n**[Tier 1: 核心强相关 9-10]**\n- **10分**: 标题即包含 'Memory', 'Long-term Agent', 'Generative Agents'，且以此为核心创新点。\n- **9分**: 论文提出了一种新的 Memory 架构（如 Memory Bank, Parametric Memory）或解决了 Agent 遗忘问题。\n\n**[Tier 2: 架构/隐式强相关 7-8]**\n- **8分**: 强相关。虽标题未提 Memory，但核心机制是 'State Maintenance', 'KV Cache Compression', 'Experience Replay'。\n- **7分**: 涉及 Infinite Context 或 SSM (Mamba)，明确提到是为了'保留历史信息'或'长期依赖'。\n\n**[Tier 3: 一般/应用相关 5-6]**\n- **6分**: 涉及 Skill Learning (技能库)、Tool-use history，或 RAG 的动态更新机制（Agentic RAG）。\n- **5分**: 涉及 Long Context 评测或应用，提到了一些 Context 管理，但创新点主要在其他方面。\n\n**[Tier 4: 勉强/边缘相关 4] - 自动收录底线**\n- **4分**: **勉强符合**。提到了 Memory 关键词（如 GPU Memory, Replay Buffer）或 Prompt Context，你觉得它跟 Agent Memory 关系很弱，但不能完全排除。**根据高召回原则，给 4 分。**\n\n**[Tier 5: 置信边界 3] - 人工复核区**\n- **3分 (关键)**: **犹豫不决**。论文讨论了 Attention 机制或检索，你完全无法确定它是单纯计算优化还是服务于记忆。或者概念非常模糊。**凡是不确定的，打 3 分，不要打 2 分。**\n\n**[Tier 6: 无关 1-2]**\n- **2分**: 明确是硬件加速、底层算子优化，虽有 Memory 字样但指物理内存。\n- **1分**: 完全无关（如图像生成、对抗攻击）。\n\n**输出格式 (JSON Only)**：\n{\"confidence_score\": int, \"reasoning\": \"简短判决理由\"}",
+  
+  "user_prompt_template": "请评估以下论文与 '{topic}' 的相关性：\n\n**标题**: {title}\n\n**摘要**: {abstract}{keywords_section}\n\n请按照评分标准给出 1-10 分评分，并以 JSON 格式输出。",
+  
+  "keywords_section_template": "\n\n**关键词**: {keywords}",
+  
+  "scoring_tiers": {
+    "10": {"name": "Core", "description": "标题含 Memory 且为核心创新点"},
+    "9": {"name": "Core", "description": "提出新 Memory 架构或解决遗忘问题"},
+    "8": {"name": "Strong", "description": "核心机制涉及状态维护/KV Cache/经验回放"},
+    "7": {"name": "Strong", "description": "涉及无限上下文或 SSM 且保留长期依赖"},
+    "6": {"name": "General", "description": "涉及技能学习/工具历史/Agentic RAG"},
+    "5": {"name": "General", "description": "涉及长上下文应用但非核心创新"},
+    "4": {"name": "Marginal", "description": "边缘相关，高召回原则收录"},
+    "3": {"name": "Boundary", "description": "置信边界，需人工复核"},
+    "2": {"name": "Irrelevant", "description": "明确是硬件/底层优化"},
+    "1": {"name": "Irrelevant", "description": "完全无关"}
+  },
+  
+  "routing_rules": {
+    "auto_accept": "score >= 4",
+    "human_review": "score == 3", 
+    "auto_reject": "score <= 2"
+  }
+}
