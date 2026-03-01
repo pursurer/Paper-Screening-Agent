@@ -69,6 +69,11 @@ class TestBuildPrompt:
         assert "9" in prompt or "10" in prompt
         assert "3" in prompt
 
+    def test_build_system_prompt_keeps_json_example(self):
+        """验证 System Prompt 的 JSON 示例不会因格式化报错或被破坏"""
+        prompt = build_system_prompt()
+        assert '{"confidence_score": int, "reasoning": "简短判决理由"}' in prompt
+
     def test_build_user_prompt(self):
         """验证 User Prompt 包含论文信息"""
         prompt = build_user_prompt(

@@ -18,6 +18,19 @@ class JudgeResult:
     reasoning: str = field(default="默认进入人工复核")
 
 
+def _safe_replace(template: str, **values: str) -> str:
+    """
+    仅替换显式占位符，保留其他花括号原样。
+
+    说明:
+        Prompt 中可能包含 JSON 示例（含花括号），直接使用 str.format 会触发 KeyError。
+    """
+    rendered = template
+    for key, value in values.items():
+        rendered = rendered.replace(f"{{{key}}}", str(value))
+    return rendered
+
+
 def load_prompt_config(config_path: str = None) -> dict:
     """
     加载提示词配置文件
@@ -99,7 +112,7 @@ def build_system_prompt(config_path: str = None) -> str:
     config = load_prompt_config(config_path)
     topic = config.get("screening_topic", "AI Memory")
     template = config.get("system_prompt", get_default_config()["system_prompt"])
-    return template.format(topic=topic)
+    return _safe_replace(template, topic=topic)
 
 
 def build_user_prompt(title: str, abstract: str, keywords: str = "", config_path: str = None) -> str:
@@ -122,9 +135,10 @@ def build_user_prompt(title: str, abstract: str, keywords: str = "", config_path
     
     keywords_section = ""
     if keywords:
-        keywords_section = keywords_template.format(keywords=keywords)
-    
-    return template.format(
+        keywords_section = _safe_replace(keywords_template, keywords=keywords)
+
+    return _safe_replace(
+        template,
         topic=topic,
         title=title,
         abstract=abstract,
