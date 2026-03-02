@@ -1,0 +1,35 @@
+{
+  "started_at": "2026-03-02T00:03:44",
+  "model": "gemini-3-flash-preview",
+  "prompt_file": "/Users/huigu/论文/论文工具/论文筛选工具/output/ICLR_prompt_compare_20260301/new_prompt_cn.txt",
+  "output_base": "/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301",
+  "conference_order": [
+    "ICLR_2026",
+    "ICML",
+    "NeurIPS",
+    "ICLR"
+  ],
+  "generation_config": {
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "top_k": 40,
+    "seed": 20260301,
+    "candidate_count": 1,
+    "max_output_tokens": 1536,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0,
+    "response_mime_type": "application/json",
+    "response_logprobs": false,
+    "logprobs": null,
+    "thinking_level": "HIGH",
+    "thinking_budget": null,
+    "include_thoughts": false,
+    "use_response_schema": true
+  },
+  "inputs": {
+    "ICLR_2026": "/Users/huigu/论文/顶会论文信息/ICLR/iclr_papers_2026.csv",
+    "ICML": "/Users/huigu/论文/顶会论文信息/ICML/icml_papers.csv",
+    "NeurIPS": "/Users/huigu/论文/顶会论文信息/NeurIPS/neurips_papers.csv",
+    "ICLR": "/Users/huigu/论文/顶会论文信息/ICLR/iclr_papers_2025.csv"
+  }
+}
