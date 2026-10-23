@@ -18,12 +18,15 @@ from google import genai
 from google.genai import types
 
 
+# 数据根目录：顶会论文 CSV 所在目录，可用 PAPERS_DATA_ROOT 覆盖
+DATA_ROOT = os.environ.get("PAPERS_DATA_ROOT", "../top-ai-conference-papers")
+
 DEFAULT_INPUTS = {
     # 用户要求 ICLR 使用 2025 年版本（约 3000+ 篇）
-    "ICLR": "/Users/huigu/论文/顶会论文信息/ICLR/iclr_papers_2025.csv",
-    "ICLR_2026": "/Users/huigu/论文/顶会论文信息/ICLR/iclr_papers_2026.csv",
-    "ICML": "/Users/huigu/论文/顶会论文信息/ICML/icml_papers.csv",
-    "NeurIPS": "/Users/huigu/论文/顶会论文信息/NeurIPS/neurips_papers.csv",
+    "ICLR": os.path.join(DATA_ROOT, "ICLR/iclr_papers_2025.csv"),
+    "ICLR_2026": os.path.join(DATA_ROOT, "ICLR/iclr_papers_2026.csv"),
+    "ICML": os.path.join(DATA_ROOT, "ICML/icml_papers.csv"),
+    "NeurIPS": os.path.join(DATA_ROOT, "NeurIPS/neurips_papers.csv"),
 }
 
 
@@ -372,12 +375,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="新提示词批量重筛（0-100）")
     parser.add_argument(
         "--prompt-file",
-        default="/Users/huigu/论文/论文工具/论文筛选工具/output/ICLR_prompt_compare_20260301/new_prompt_cn.txt",
+        required=True,
         help="新提示词文件路径",
     )
     parser.add_argument(
         "--output-base",
-        default="/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301",
+        default=os.path.join("output", "new_prompt_rerun"),
         help="输出根目录",
     )
     parser.add_argument(

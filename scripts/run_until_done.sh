@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/huigu/论文/论文工具/论文筛选工具"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNNER="$ROOT/src/new_prompt_screen_batch.py"
+PROMPT_FILE="${PROMPT_FILE:?set PROMPT_FILE to the prompt text file}"
 OUTPUT_BASE="$ROOT/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301"
 CONFERENCES="ICLR_2026,ICML,NeurIPS,ICLR"
 LOG_FILE="$OUTPUT_BASE/run_until_done.log"
@@ -59,6 +60,7 @@ while true; do
   set +e
   env API_KEYS="$API_KEYS" \
     python "$RUNNER" \
+      --prompt-file "$PROMPT_FILE" \
       --output-base "$OUTPUT_BASE" \
       --conferences "$CONFERENCES" \
       --concurrency-per-key 6 \

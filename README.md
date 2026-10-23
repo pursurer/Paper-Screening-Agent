@@ -1,170 +1,93 @@
-# 🔬 Paper-Screening-Agent
+# Paper-Screening-Agent
 
-**Screen 1000+ papers in minutes, not days.**
+[![Tests](https://github.com/pursurer/Paper-Screening-Agent/actions/workflows/tests.yml/badge.svg)](https://github.com/pursurer/Paper-Screening-Agent/actions)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An AI agent that automatically reads paper abstracts, evaluates research relevance with a **1-10 scoring system**, and routes papers into accept/review/reject categories. Built for researchers who need to efficiently survey literature across any domain.
+An LLM agent that reads paper abstracts, scores how relevant each paper is to one research topic
+(1–10), and routes it to accept, human review or reject. It runs on the Gemini API and can spread
+the work over several API keys.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+It graded 10,000+ papers from the 2025 editions of 10 AI conferences for agent memory: 5,720 were
+accepted and 4,421 went to human review. The accepted list is
+[Curated-Agent-Memory-Papers](https://github.com/pursurer/Curated-Agent-Memory-Papers); the input
+came from [top-ai-conference-papers](https://github.com/pursurer/top-ai-conference-papers).
 
-## ✨ Features
+## How it works
 
-| Feature | Description |
-|---------|-------------|
-| **🎯 1-10 Scoring** | Semantic-anchored scoring ensures consistent, explainable evaluation |
-| **📊 Tiered Routing** | Auto-accept (≥4), Human review (=3), Auto-reject (≤2) |
-| **⚡ 200+ Concurrent** | Multi-API parallel processing with independent worker pools |
-| **🔄 Breakpoint Resume** | Crash-safe — automatically resumes from last processed paper |
-| **📝 Customizable Prompts** | Swap `config/prompts.json` to adapt to any research topic |
-| **🛡️ High-Recall Design** | "Never miss important work" — uncertain papers go to review, not rejection |
+1. Read a CSV of papers (`id`, `title`, `abstract`; `keywords`, `pdf` optional).
+2. Ask the LLM for a score and a short reason. The prompt comes from `config/prompts.json`.
+3. Route by score. The rule favours recall: a weak but possible match is kept, and an uncertain
+   one goes to a person instead of being dropped.
 
-## 🏗️ How It Works
+| Score | Tier | Meaning | Route |
+| --- | --- | --- | --- |
+| 10 | Core | The topic is the paper's main contribution, named in the title | Accept |
+| 9 | Core | New method that directly addresses the topic | Accept |
+| 7–8 | Strong | Core mechanism closely related | Accept |
+| 5–6 | General | Uses the topic in an application | Accept |
+| 4 | Marginal | Weak but possible relevance | Accept |
+| 3 | Boundary | Uncertain | Human review |
+| 1–2 | Irrelevant | Clearly unrelated | Reject |
 
-```
-┌────────────┐     ┌─────────────┐     ┌──────────┐     ┌─────────────┐
-│ CSV Input  │────▶│  LLM Judge  │────▶│  Router  │────▶│   Output    │
-│ (papers)   │     │ (1-10 score)│     │ (triage) │     │ (sorted CSV)│
-└────────────┘     └─────────────┘     └──────────┘     └─────────────┘
-                          │                  │
-                   ┌──────┴──────┐    ┌──────┴──────────────────┐
-                   │   Prompt    │    │  Score ≥ 4 → ACCEPTED   │
-                   │   Config    │    │  Score = 3 → REVIEW     │
-                   │   (JSON)    │    │  Score ≤ 2 → REJECTED   │
-                   └─────────────┘    └─────────────────────────┘
-```
+Results are written as each paper finishes, so a stopped run picks up where it left off: papers
+already in the output files are skipped.
 
-## 🎯 Design Philosophy
-
-### High-Recall Scoring
-The agent prioritizes **not missing important papers**:
-- **Score 4**: Marginally relevant → still included
-- **Score 3**: Uncertain → human review (safety net)
-- **Score 1-2**: Clearly irrelevant → auto-reject
-
-### Semantic Anchoring
-Each score has a **precise definition** to ensure LLM consistency:
-
-| Score | Tier | Meaning |
-|-------|------|---------|  
-| 10 | Core | Title explicitly contains topic keyword as main contribution |
-| 9 | Core | Proposes new architecture/method directly addressing topic |
-| 7-8 | Strong | Core mechanism strongly related (implicit relevance) |
-| 5-6 | General | Application-level relevance |
-| 4 | Marginal | Weak but possible relevance — include for high recall |
-| 3 | Boundary | Uncertain — route to human review |
-| 1-2 | Irrelevant | Clearly unrelated |
-
-## 📦 Installation
+## Install
 
 ```bash
 git clone https://github.com/pursurer/Paper-Screening-Agent.git
 cd Paper-Screening-Agent
-
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-cp .env.example .env
-# Add your Gemini API key(s) to .env
 ```
 
-## ⚙️ Configuration
-
-### API Keys
-```bash
-# .env file
-GEMINI_API_KEY=your_key_here
-
-# Or pass multiple keys via CLI for higher throughput
---api-keys "key1,key2,key3,key4"
-```
-
-### Customizing for Your Topic
-
-Edit `config/prompts.json` to adapt to **any research domain**:
-
-```json
-{
-  "screening_topic": "Reinforcement Learning",
-  "system_prompt": "You are an expert. Score papers on '{topic}' relevance (1-10)...",
-  "scoring_tiers": {
-    "10": {"name": "Core", "description": "Title contains RL/Policy/Reward"},
-    "9": {"name": "Core", "description": "Proposes new RL algorithm"},
-    ...
-  }
-}
-```
-
-## 🚀 Usage
+## Run
 
 ```bash
-# Basic: single API key
 python -m src.multi_api_batch \
   --input papers.csv \
   --output output/results \
-  --api-keys "YOUR_API_KEY"
-
-# Turbo: 4 API keys × 50 concurrent = 200 parallel requests
-python -m src.multi_api_batch \
-  --input papers.csv \
-  --output output/results \
-  --api-keys "KEY1,KEY2,KEY3,KEY4" \
-  --concurrency 50
+  --api-keys "KEY1,KEY2"
 ```
 
-### Input Format
+Each key gets its own worker pool. `--concurrency` sets requests per key (default 50) and
+`--model` sets the Gemini model (default `gemini-2.5-flash`).
 
-| Field | Required | Description |
-|-------|:--------:|-------------|
-| id | ✅ | Unique identifier |
-| title | ✅ | Paper title |
-| abstract | ✅ | Paper abstract |
-| keywords | | Optional |
-| pdf | | PDF link |
-
-### Output
+Two files come out:
 
 | File | Content |
-|------|---------|
-| `ai_memory_papers_graded.csv` | Accepted papers (score ≥ 4), sorted by relevance |
-| `human_review_boundary.csv` | Boundary cases (score = 3) for manual review |
+| --- | --- |
+| `ai_memory_papers_graded.csv` | Accepted papers (score ≥ 4) with score, tier and reason |
+| `human_review_boundary.csv` | Boundary papers (score 3) for manual review |
 
-## 📁 Project Structure
+Rejected papers are counted but not written. The file names keep the agent-memory topic they
+were first used for.
 
-```
-Paper-Screening-Agent/
-├── src/
-│   ├── llm_judge.py         # LLM scoring (loads from config)
-│   ├── router.py            # Accept/Review/Reject routing
-│   ├── paper_parser.py      # CSV parser
-│   ├── output_generator.py  # Output writer
-│   ├── multi_api_batch.py   # Multi-API parallel engine
-│   └── statistics.py        # Logging & stats
-├── config/
-│   └── prompts.json         # ⭐ Customizable prompts
-├── tests/
-├── .env.example
-├── requirements.txt
-└── README.md
-```
+## Screen a different topic
 
-## 🧪 Testing
+Edit `config/prompts.json`. The code reads four entries: `screening_topic`, `system_prompt`,
+`user_prompt_template` and `keywords_section_template`. The score definitions live inside
+`system_prompt` (in Chinese, written for agent memory), so rewrite them for the new topic.
+`scoring_tiers` and `routing_rules` only document the scale; the routing thresholds are in
+`src/router.py`.
+
+## Other entry points
+
+| Script | Use |
+| --- | --- |
+| `src/main.py` | One key, one request at a time; reads `GEMINI_API_KEY` from `.env` |
+| `src/async_main.py` | One key, concurrent; `batch_process` runs it once per conference |
+| `src/batch_process.py` | Nine conferences (all but NeurIPS) from `PAPERS_DATA_ROOT`, default `../top-ai-conference-papers` |
+| `src/new_prompt_screen_batch.py` | Experimental 0–100 rescoring with a prompt file you supply |
+
+## Tests
 
 ```bash
-pytest tests/ -v
+pytest tests/
 ```
 
-## 🌟 Example Use Case
+## License
 
-This tool screened papers from the 2025 editions of 10 AI conferences for AI-memory research. It accepted **5,720 papers** (score ≥ 4) and sent **4,421** borderline papers (score 3) to human review:
-
-👉 [Curated-Agent-Memory-Papers](https://github.com/pursurer/Curated-Agent-Memory-Papers)
-
-## 📄 License
-
-MIT License
-
-## 🤝 Contributing
-
-Pull requests welcome! Feel free to open issues for bugs or feature requests.
+MIT, see [LICENSE](LICENSE).

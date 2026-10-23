@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="/Users/huigu/论文/论文工具/论文筛选工具"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUNNER="$ROOT/src/new_prompt_screen_batch.py"
+PROMPT_FILE="${PROMPT_FILE:?set PROMPT_FILE to the prompt text file}"
 OUTPUT_BASE="$ROOT/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301"
 CONFERENCES="ICLR_2026,ICML,NeurIPS,ICLR"
 CHECK_INTERVAL="${CHECK_INTERVAL:-20}"
@@ -49,6 +50,7 @@ start_runner() {
   log "检测到评分进程不存在，启动断点续跑..."
   nohup env API_KEYS="$API_KEYS" \
     python "$RUNNER" \
+      --prompt-file "$PROMPT_FILE" \
       --output-base "$OUTPUT_BASE" \
       --conferences "$CONFERENCES" \
       --concurrency-per-key 6 \

@@ -10,17 +10,23 @@ from dotenv import load_dotenv
 from src.async_main import run_pipeline_async
 
 
-# 会议配置：会议名称 -> CSV 文件路径
+# 数据根目录：top-ai-conference-papers 仓库的本地路径，可用 PAPERS_DATA_ROOT 覆盖
+DATA_ROOT = os.environ.get("PAPERS_DATA_ROOT", "../top-ai-conference-papers")
+
+# 会议配置：会议名称 -> CSV 文件路径（相对数据根目录）
 CONFERENCE_CONFIG: Dict[str, str] = {
-    "AAAI": "/Users/huigu/论文系统/顶会论文信息/AAAI/aaai_papers.csv",
-    "ACL": "/Users/huigu/论文系统/顶会论文信息/ACL/acl_papers.csv",
-    "EMNLP": "/Users/huigu/论文系统/顶会论文信息/EMNLP/emnlp_papers.csv",
-    "ICLR": "/Users/huigu/论文系统/顶会论文信息/ICLR/iclr_papers.csv",
-    "ICML": "/Users/huigu/论文系统/顶会论文信息/ICML/icml_papers.csv",
-    "IJCAI": "/Users/huigu/论文系统/顶会论文信息/IJCAI/ijcai_papers.csv",
-    "NAACL": "/Users/huigu/论文系统/顶会论文信息/NAACL/naacl_papers.csv",
-    "AISTATS": "/Users/huigu/论文系统/顶会论文信息/AISTATS/aistats_papers.csv",
-    "AAMAS": "/Users/huigu/论文系统/顶会论文信息/AAMAS/aamas_2025_unified.csv",
+    name: os.path.join(DATA_ROOT, rel)
+    for name, rel in {
+        "AAAI": "AAAI/aaai_papers.csv",
+        "ACL": "ACL/acl_papers.csv",
+        "EMNLP": "EMNLP/emnlp_papers.csv",
+        "ICLR": "ICLR/iclr_papers.csv",
+        "ICML": "ICML/icml_papers.csv",
+        "IJCAI": "IJCAI/ijcai_papers.csv",
+        "NAACL": "NAACL/naacl_papers.csv",
+        "AISTATS": "AISTATS/aistats_papers.csv",
+        "AAMAS": "AAMAS/aamas_2025_unified.csv",
+    }.items()
 }
 
 
