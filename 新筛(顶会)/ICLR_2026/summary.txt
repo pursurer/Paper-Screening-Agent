@@ -1,9 +1,0 @@
-conference: ICLR_2026
-input_path: /Users/huigu/论文/顶会论文信息/ICLR/iclr_papers_2026.csv
-model: gemini-3-flash-preview
-generation_config: {'temperature': 0.2, 'top_p': 0.9, 'top_k': 40, 'seed': 20260301, 'candidate_count': 1, 'max_output_tokens': 1536, 'presence_penalty': 0.0, 'frequency_penalty': 0.0, 'response_mime_type': 'application/json', 'response_logprobs': False, 'logprobs': None, 'thinking_level': 'HIGH', 'thinking_budget': None, 'include_thoughts': False, 'use_response_schema': True}
-total_rows: 5342
-avg_score_100: 19.31
-parse_fail_count: 280
-priority_distribution: {'Priority1_80_100': 92, 'Priority2_60_79': 156, 'Priority3_40_59': 518, 'Priority4_lt40': 4576}
-output_files: {'raw': '/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301/ICLR_2026/scored_raw_incremental.csv', 'all_sorted': '/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301/ICLR_2026/scored_all_0_100.csv', 'p1_80_100': '/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301/ICLR_2026/priority1_80_100.csv', 'p2_60_79': '/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301/ICLR_2026/priority2_60_79.csv', 'p3_40_59_review': '/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301/ICLR_2026/priority3_40_59_review.csv', 'p4_lt40': '/Users/huigu/论文/论文工具/论文筛选工具/output/new_prompt_full_rerun_gemini3_flash_preview_highthinking_20260301/ICLR_2026/priority4_lt40.csv'}
