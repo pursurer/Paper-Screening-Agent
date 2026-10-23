@@ -157,7 +157,7 @@ pytest tests/ -v
 
 ## 🌟 Example Use Case
 
-This tool was used to screen **5,700+ papers** on AI Memory from 10 top conferences:
+This tool screened papers from the 2025 editions of 10 AI conferences for AI-memory research. It accepted **5,720 papers** (score ≥ 4) and sent **4,421** borderline papers (score 3) to human review:
 
 👉 [Curated-Agent-Memory-Papers](https://github.com/pursurer/Curated-Agent-Memory-Papers)
 
